@@ -1,7 +1,7 @@
 from django.db import models
 
 from django.contrib.auth.models import(AbstractBaseUser,BaseUserManager,PermissionsMixin)
-from rest_framework_simplejwt.tokens import RefreshToken
+
 
 class UserManager(BaseUserManager):
     def create_user(self,firstname,lastname,email,username,password=None):
@@ -15,7 +15,7 @@ class UserManager(BaseUserManager):
                         username=username,
                         email=self.normalize_email(email))
         user.set_password(password)
-        user.save()
+        user.save(using=self._db)
         return user
 
     def create_superuser(self,firstname,lastname,email,username,password=None):
@@ -27,8 +27,6 @@ class UserManager(BaseUserManager):
         user.is_staff = True
         user.save()
         return user
-
-
 
 
 class User(AbstractBaseUser,PermissionsMixin):
@@ -50,9 +48,3 @@ class User(AbstractBaseUser,PermissionsMixin):
     def __str__(self):
         return self.email
 
-    def tokens(self):
-        refresh=RefreshToken.for_user(self)
-        return{
-            'refresh':str(refresh),
-            'access':str(refresh.access_token)
-        }

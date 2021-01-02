@@ -1,24 +1,26 @@
 from rest_framework import serializers
-from .models import User
+from authentication.models import User
 from django.contrib import auth
 from rest_framework.exceptions import AuthenticationFailed
+from django.contrib.auth import authenticate
+
+
 class RegisterSerializer(serializers.ModelSerializer):
-    password=serializers.CharField(
-        max_length=68,min_length=10,write_only=True)
+    password =serializers.CharField(write_only=True)
 
     class Meta:
-        model=User
-        fields=['firstname','lastname','email','username','password']
+        model =User
+        fields =['firstname' ,'lastname' ,'email' ,'username' ,'password']
 
-    def validate(self,attrs):
-        email=attrs.get('email','')
-        username=attrs.get('username','')
+    def validate(self ,attrs):
+        email =attrs.get('email' ,'')
+        username =attrs.get('username' ,'')
 
         if not username.isalnum():
             raise serializers.ValidationError('username must only contain alphanumeric')
         return attrs
 
-    def create(self,validated_data):
+    def create(self ,validated_data):
         return User.objects.create_user(**validated_data)
 
 
@@ -27,63 +29,75 @@ class EmailVerificationSerializer(serializers.ModelSerializer):
     token = serializers.CharField(max_length=700)
 
     class Meta:
-        model=User
-        fields=['token']
-"""
+        model =User
+        fields =['token']
+
 class LoginSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(max_length=255, min_length=3)
-    password = serializers.CharField(max_length=68, min_length=6, write_only=True, style={'input_type': 'password'})
-    username = serializers.CharField(max_length=255, min_length=3, read_only=True)
-    tokens = serializers.CharField(max_length=68, min_length=6, read_only=True)
+    email =serializers.EmailField()
+    password =serializers.CharField(max_length=68, min_length=3)
+
 
     class Meta:
-        model=User
-        fields=['email','password','username','tokens']
+        model =User
+        fields =['email' ,'password']
+
+    def validate(self ,attrs):
+        email =attrs.get('email' ,'')
+        password =attrs.get('password' ,'')
+
+        try:
+
+
+            user = User.objects.get(email=email, password=password)
+            if not user:
+                raise AuthenticationFailed('INVALID DATA GIVEN,TRY AGAIN')
+            if not user.is_active:
+                raise AuthenticationFailed('ACCOUNT IS NOT ACTIVATED YET')
+            if not user.is_verified:
+                raise AuthenticationFailed('EMAIL ID IS NOT VERIFIED YET')
+
+        except serializers.ValidationError as identifier:
+            return {'error': "check with your email and password"}
+
+        return {
+            'email': user.email,
+            'password': user.password,
+        }
+
+class ResetPasswordSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(max_length=255, min_length=3)
+
+    class Meta:
+        model = User
+        fields = ['email']
 
     def validate(self, attrs):
-        email= attrs.get('email','')
-        password = attrs.get('password','')
+        email = attrs.get('email', '')
+        try:
+            user = User.objects.get(email=email)
+            if not user.is_verified:
+                raise serializers.ValidationError("This email id is not verified!!")
+        except User.DoesNotExist:
+            raise serializers.ValidationError("This email is not registerd")
 
-        user = auth.authenticate(email=email, password=password)
-        if not user:
-            raise AuthenticationFailed("Invalid credentials given!!!")
-        if not user.is_active:
-            raise AuthenticationFailed("Account is deactivated!!!")
-        if not user.is_verified:
-            raise AuthenticationFailed("Email is not verified!!!")
-        return {
-            'email':user.email,
-            'username':user.username,
-            'tokens': user.tokens()
-        }
-"""
-class LoginSerializer(serializers.ModelSerializer):
-    email=serializers.EmailField()
-    password=serializers.CharField( write_only=True)
-    username = serializers.CharField( write_only=True)
-    tokens = serializers.CharField(read_only=True)
+        return attrs
+
+
+class NewPasswordSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(max_length=68, min_length=6)
+    NewPassword=serializers.CharField(max_length=68, min_length=6)
+
+
     class Meta:
-        model=User
-        fields=['email','password','username','tokens']
+        model = User
+        fields = ['password', 'NewPassword']
 
+    def validate(self, attrs):
+        password = attrs.get('password', '')
+        NewPassword =attrs.get('NewPassword', '')
 
-    def validate(self,attrs):
-        email=attrs.get('email','')
-        password=attrs.get('password','')
-        user=auth.authenticate(email=email,password=password)
+        if password != NewPassword:
+            raise serializers.ValidationError("Password not matched!!")
 
-        if not user:
-            raise AuthenticationFailed('INVALID DATA GIVEN,TRY AGAIN')
-        if not user.is_active:
-            raise AuthenticationFailed('ACCOUNT IS NOT ACTIVATED YET')
-        if not user.is_verified:
-            raise AuthenticationFailed('EMAIL ID IS NOT VERIFIED YET')
-
-
-        return {
-            'email':user.email,
-            'username':user.username,
-            'tokens':user.tokens
-        }
-        return super().validate(attrs)
+        return attrs
 
