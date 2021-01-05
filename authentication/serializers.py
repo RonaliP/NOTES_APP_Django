@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from authentication.models import User
+from authentication.models import User, UserProfile
 from django.contrib import auth
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
@@ -100,4 +100,10 @@ class NewPasswordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Password not matched!!")
 
         return attrs
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['first_name', 'last_name', 'DOB', 'image', 'user_id']
 

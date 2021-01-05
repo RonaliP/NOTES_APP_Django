@@ -2,14 +2,13 @@ from django.shortcuts import HttpResponse, render,redirect
 from rest_framework import generics, status, views, permissions
 from .serializers import RegisterSerializer,\
     EmailVerificationSerializer,LoginSerializer,\
-    ResetPasswordSerializer,NewPasswordSerializer
+    ResetPasswordSerializer,NewPasswordSerializer,UserProfileSerializer
 
 from django.contrib.auth import logout,login, authenticate
-from rest_framework.permissions import AllowAny
 
 
 from rest_framework.response import Response
-from authentication.models import User
+from authentication.models import User,UserProfile
 from authentication.utils import Util
 from django.contrib.sites.shortcuts import  get_current_site
 from django.urls import reverse
@@ -18,11 +17,11 @@ import jwt
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework_jwt.utils import jwt_payload_handler
-from django.contrib.sessions.models import Session
+#from django.contrib.sessions.models import Session
+from rest_framework.permissions import AllowAny
 
 # Create your views here.
 class RegisterView(generics.GenericAPIView):
-    serializer_class = RegisterSerializer
 
     serializer_class = RegisterSerializer
 
@@ -34,16 +33,19 @@ class RegisterView(generics.GenericAPIView):
         user_data = serializer.data
 
         user = User.objects.get(email=user_data['email'])
-        payload = jwt_payload_handler(user)
-        token = jwt.encode(payload, settings.SECRET_KEY).decode('UTF-8')
-        #token = jwt.encode({'message': 'Hello'}, app.config['SECRET_KEY']).decode('UTF-8')
-        current_site = get_current_site(request).domain
-        relativeLink = reverse('email-verify')
-        absurl = 'http://' + current_site + relativeLink + "?token=" + str(token)
-        email_body = 'Hi' + user.username + ' Use this below to verify your email \n' + absurl
-        data = {'email_body': email_body, 'to_email': user.email, 'email_subject': 'Verify you email'}
-        Util.send_email(data)
-        return Response(user_data, status=status.HTTP_201_CREATED)
+        try:
+            payload = jwt_payload_handler(user)
+            token = jwt.encode(payload, settings.SECRET_KEY).decode('UTF-8')
+                #token = jwt.encode({'message': 'Hello'}, app.config['SECRET_KEY']).decode('UTF-8')
+            current_site = get_current_site(request).domain
+            relativeLink = reverse('email-verify')
+            absurl = 'http://' + current_site + relativeLink + "?token=" + str(token)
+            email_body = 'Hi' + user.username + ' Use this below to verify your email \n' + absurl
+            data = {'email_body': email_body, 'to_email': user.email, 'email_subject': 'Verify you email'}
+            Util.send_email(data)
+            return Response(user_data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            raise e
 
 
 
@@ -139,7 +141,20 @@ class NewPassword(generics.GenericAPIView):
 
 class LogoutView(generics.GenericAPIView):
 
-    permission_classes = permissions.IsAuthenticated
+    permission_classes = (permissions.IsAuthenticated,)
     def get(self, request):
         logout(request)
-        return Response({"success": "Successfully logged out."},status=status.HTTP_200_OK)
+        return Response({"success": " you are logged out now."},status=status.HTTP_200_OK)
+
+
+
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    permission_classes=(permissions.IsAuthenticated,)
+    serializer_class = UserProfileSerializer
+    queryset=UserProfile.objects.all()
+
+    def get_object(self):
+        try:
+            return self.request.user.profile
+        except Exception as e:
+            pass

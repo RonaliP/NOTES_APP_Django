@@ -37,6 +37,7 @@ class User(AbstractBaseUser,PermissionsMixin):
     is_verified=models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_staff = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
@@ -47,4 +48,14 @@ class User(AbstractBaseUser,PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+class UserProfile(models.Model):
+
+    user = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='profile')
+    first_name = models.CharField(max_length=50, unique=False)
+    last_name = models.CharField(max_length=50, unique=False)
+    DOB = models.DateField(max_length=8)
+    created_at = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='profile_picture/',max_length=255, null=True, blank=True)
+
 
