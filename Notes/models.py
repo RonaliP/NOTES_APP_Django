@@ -2,8 +2,18 @@ from django.db import models
 from authentication.models import User
 
 # Create your models here.
+
+
+class Labels(models.Model):
+    name = models.TextField(db_index=True)
+    owner=models.ForeignKey(to=User, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True, null=False, blank=False)
+
 class Notes(models.Model):
+    owner = models.ForeignKey(to=User, on_delete=models.CASCADE)
     title=models.TextField()
     content=models.TextField(db_index=True)
-    writer=models.ForeignKey(to=User,on_delete=models.CASCADE)
-    date = models.DateTimeField(null=False, blank=False)
+    label = models.ManyToManyField(to=Labels)
+    isArchive = models.BooleanField(default=False)
+    isDelete = models.BooleanField(default=False)
+    date = models.DateTimeField(auto_now_add=True, null=False, blank=False)
