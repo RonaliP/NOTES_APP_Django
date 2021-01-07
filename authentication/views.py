@@ -1,3 +1,4 @@
+from django.db.migrations import serializer
 from django.shortcuts import HttpResponse, render,redirect
 from rest_framework import generics, status, views, permissions
 from .serializers import RegisterSerializer,\
@@ -5,10 +6,8 @@ from .serializers import RegisterSerializer,\
     ResetPasswordSerializer,NewPasswordSerializer,UserProfileSerializer
 
 from django.contrib.auth import logout,login, authenticate
-
-
 from rest_framework.response import Response
-from authentication.models import User,UserProfile
+from authentication.models import User,Profile
 from authentication.utils import Util
 from django.contrib.sites.shortcuts import  get_current_site
 from django.urls import reverse
@@ -147,14 +146,14 @@ class LogoutView(generics.GenericAPIView):
         return Response({"success": " you are logged out now."},status=status.HTTP_200_OK)
 
 
-
 class UserProfileView(generics.RetrieveUpdateAPIView):
-    permission_classes=(permissions.IsAuthenticated,)
     serializer_class = UserProfileSerializer
-    queryset=UserProfile.objects.all()
+    queryset=Profile.objects.all()
+
+
+
+    def perform_create(self):
+        return serializer.save(user=self.request.user)
 
     def get_object(self):
-        try:
-            return self.request.user.profile
-        except Exception as e:
-            pass
+        return self.request.user.profile
