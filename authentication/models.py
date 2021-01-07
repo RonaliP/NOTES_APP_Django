@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.signals import post_save
 
 from django.contrib.auth.models import(AbstractBaseUser,BaseUserManager,PermissionsMixin)
 
@@ -49,13 +50,15 @@ class User(AbstractBaseUser,PermissionsMixin):
     def __str__(self):
         return self.email
 
-class UserProfile(models.Model):
+class Profile(models.Model):
 
-    user = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='profile')
-    first_name = models.CharField(max_length=50, unique=False)
-    last_name = models.CharField(max_length=50, unique=False)
-    DOB = models.DateField(max_length=8)
+    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
+    DOB = models.DateField(max_length=8,null=True)
+    BIO=models.CharField(max_length=200,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(upload_to='profile_picture/',max_length=255, null=True, blank=True)
+    image = models.ImageField(default='default.jpg', upload_to='profile_pic')
+
+
+
 
 
