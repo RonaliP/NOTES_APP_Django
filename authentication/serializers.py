@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from authentication.models import User, UserProfile
+from authentication.models import User,Profile
 from django.contrib import auth
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
@@ -10,7 +10,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model =User
-        fields =['firstname' ,'lastname' ,'email' ,'username' ,'password']
+        fields =['firstname','lastname','email','username' ,'password']
 
     def validate(self ,attrs):
         email =attrs.get('email' ,'')
@@ -104,6 +104,13 @@ class NewPasswordSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserProfile
-        fields = ['first_name', 'last_name', 'DOB', 'image', 'user_id']
+        model = Profile
+        fields = ['DOB', 'image', 'user_id']
+
+    def validate(self, attrs):
+        DOB = attrs.get('DOB', '')
+        image = attrs.get('image', '')
+        return attrs
+
+
 
