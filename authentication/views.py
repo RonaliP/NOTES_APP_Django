@@ -16,7 +16,6 @@ import jwt
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework_jwt.utils import jwt_payload_handler
-#from django.contrib.sessions.models import Session
 from rest_framework.permissions import AllowAny
 
 # Create your views here.
@@ -39,10 +38,10 @@ class RegisterView(generics.GenericAPIView):
             current_site = get_current_site(request).domain
             relativeLink = reverse('email-verify')
             absurl = 'http://' + current_site + relativeLink + "?token=" + str(token)
-            email_body = 'Hi' + user.username + ' Use this below to verify your email \n' + absurl
+            email_body = 'Hi' + user.username + 'Use this below to verify your email \n' + absurl
             data = {'email_body': email_body, 'to_email': user.email, 'email_subject': 'Verify you email'}
             Util.send_email(data)
-            return Response(user_data, status=status.HTTP_201_CREATED)
+            return Response(user_data,status=status.HTTP_201_CREATED)
         except Exception as e:
             raise e
 
@@ -132,7 +131,10 @@ class NewPassword(generics.GenericAPIView):
             user = User.objects.get(id=payload['user_id'])
             user.password = user_data['password']
             user.save()
-            return Response({'email': 'New password is created'}, status=status.HTTP_200_OK)
+            return Response({'+'
+                             ''
+                             '+'
+                             'email': 'New password is created'}, status=status.HTTP_200_OK)
         except jwt.ExpiredSignatureError as identifier:
             return Response({'error': 'Link is Expired'}, status=status.HTTP_400_BAD_REQUEST)
         except jwt.exceptions.DecodeError as identifier:

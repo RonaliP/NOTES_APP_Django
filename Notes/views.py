@@ -1,59 +1,129 @@
 from django.shortcuts import render
-from Notes.serializers import NotesSerializer, LabelsSerializer, ArchiveNotesSerializer, TrashSerializer, \
-    AddLabelsToNoteSerializer
+from rest_framework.filters import SearchFilter
+from rest_framework.response import Response
+from Notes.serializers import NotesSerializer, LabelsSerializer, \
+    ArchiveNotesSerializer, TrashSerializer, AddLabelsToNoteSerializer
 from Notes.permissions import IsOwner
 from Notes.models import Notes, Labels
-from rest_framework import generics, permissions
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from rest_framework.response import Response
+from rest_framework import generics, permissions, status
+# FOR CACHING
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+import logging
 
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
+logger = logging.getLogger('django')
 
 # Create your views here.
 
 class CreateNotes(generics.CreateAPIView):
+    """This Api will create notes for the current user """
     serializer_class = NotesSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
-        return serializer.save(owner=self.request.user)
+        owner = self.request.user
+        note = serializer.save(owner=owner)
+        cache.set(str(owner) + "-notes-" + str(note.id), note)
+        if cache.get(str(owner) + "-notes-" + str(note.id)):
+            logger.info(str(owner) + "-notes-" + str(note.id))
+            logger.info("DATA STORED IN CACHE")
+            return Response({'success': 'New note is created!!'}, status=status.HTTP_201_CREATED)
 
 
 class DisplayNotes(generics.ListAPIView):
+    """This Api will list out all the notes of current user from database """
     serializer_class = NotesSerializer
     queryset = Notes.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+    """
+    def get_queryset(self, notes=None):
+        if cache.get(notes):
+            print("data coming from cache")
+            return cache.get(notes)
+        else:
+            data = self.queryset.filter(owner=self.request.user, isArchive=False, isDelete=False)
+            cache.set(notes, data)
+            print("data saved in cache")
+            return cache.get(notes)
 
-    def get_queryset(self):
-        return self.queryset.filter(owner=self.request.user, isArchive=False, isDelete=False)
-
+    """
+class Notesearch(generics.ListAPIView):
+    """This is a search note api which will search for the existing notes"""
+    queryset = Notes.objects.all()
+    serializer_class = NotesSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['title']
 
 
 class NoteDetails(generics.RetrieveUpdateDestroyAPIView):
+    """API to retrieve, update, and delete note by id """
     serializer_class = NotesSerializer
     queryset = Notes.objects.all()
     permission_classes = (permissions.IsAuthenticated, IsOwner)
     lookup_field = "id"
 
-    def perform_create(self, serializer):
-        return serializer.save(owner=self.request.user)
+    def perform_update(self,serializer):
+        """ Save notes model instance with updated data """
+        owner = self.request.user
+        note = serializer.save(owner=owner)
+        updated_data=cache.add(str(owner)+"-notes-"+str(note.id), note)
+        logger.info(updated_data)
+        logger.info("updated note data is set")
+        return note
 
     def get_queryset(self):
-        return self.queryset.filter(owner=self.request.user, isDelete=False)
+        """ Get note for given id owned by user """
+        owner = self.request.user
+        if cache.get(str(owner) + "-notes-" + str(self.kwargs[self.lookup_field])):
+            queryset = cache.get(str(owner) + "-notes-" + str(self.kwargs[self.lookup_field]))
+            logger.info("updated note data is coming from cache")
+            return queryset
 
+        else:
+            queryset = self.queryset.filter(owner=owner, isDelete=False, id=self.kwargs[self.lookup_field])
+            logger.info("updated note data is coming form database")
+            cache.set(str(owner) + "-notes-" + str(self.kwargs[self.lookup_field]), queryset)
+            return queryset
+
+    def perform_destroy(self, instance):
+        owner = self.request.user
+        cache.delete(str(owner) + "-notes-" + str(self.kwargs[self.lookup_field]))
+        instance.delete()
 
 class CreateAndDisplayLabels(generics.ListCreateAPIView):
+    """ API views for list and create labels for logged in user """
     serializer_class = LabelsSerializer
     queryset = Labels.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
-        return serializer.save(owner=self.request.user)
+        owner = self.request.user
+        label = serializer.save(owner)
+        cache.set(str(owner) + "-labels-" + str(label.id), label)
+        if cache.get(str(owner) + "-labels-" + str(label.id)):
+            logger.info("Label data is stored in cache")
+        return Response({'success': 'New label is added!!'}, status=status.HTTP_201_CREATED)
 
-    def get_queryset(self):
-        return self.queryset.filter(owner=self.request.user)
+    """Implemented cache"""
+
+    def get_queryset(self, queryset=None):
+
+        if cache.get(queryset):
+            print("label data coming from cache")
+            return cache.get(queryset)
+        else:
+            labels = self.queryset.filter(owner=self.request.user)
+            cache.set(queryset, labels)
+            print("label data saved in cache")
+            return cache.get(queryset)
 
 
 class LabelDetails(generics.RetrieveUpdateDestroyAPIView):
+
     serializer_class = LabelsSerializer
     queryset = Labels.objects.all()
     permission_classes = (permissions.IsAuthenticated, IsOwner)
@@ -62,8 +132,16 @@ class LabelDetails(generics.RetrieveUpdateDestroyAPIView):
     def perform_create(self, serializer):
         return serializer.save(owner=self.request.user)
 
-    def get_queryset(self):
-        return self.queryset.filter(owner=self.request.user)
+    def get_queryset(self, queryset=None):
+
+        if cache.get(queryset):
+            print("labeldata coming from cache")
+            return cache.get(queryset)
+        else:
+            detailoflabel_id = self.queryset.filter(owner=self.request.user)
+            cache.set(queryset, detailoflabel_id)
+            print("labeldata saved in cache")
+            return cache.get(queryset)
 
 
 class ArchiveNote(generics.RetrieveUpdateAPIView):
