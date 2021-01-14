@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import User
+from django.contrib.postgres.fields import JSONField
 
 # Create your models here.
 
@@ -17,3 +18,4 @@ class Notes(models.Model):
     isArchive = models.BooleanField(default=False)
     isDelete = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True, null=False, blank=False)
+    collaborators = JSONField(null=True, blank=True)
