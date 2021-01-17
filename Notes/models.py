@@ -18,4 +18,4 @@ class Notes(models.Model):
     isArchive = models.BooleanField(default=False)
     isDelete = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True, null=False, blank=False)
-    collaborators = JSONField(null=True, blank=True)
+    collaborator = models.ForeignKey(to=User, related_name='user', on_delete=models.CASCADE, blank=True, null=True)
