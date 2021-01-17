@@ -1,9 +1,10 @@
 from django.urls import path
 from django.conf.urls import url
 from Notes.views import CreateNotes,DisplayNotes, NoteDetails, CreateAndDisplayLabels, LabelDetails, ArchiveNote, NoteToTrash, \
-    ArchiveNotesList, TrashList, AddLabelsToNote, ListNotesInLabel,Notesearch
+    ArchiveNotesList, TrashList, AddLabelsToNote, ListNotesInLabel,Notesearch,AddCollaboratorForNotes
 
 urlpatterns = [
+    path('add-collaborator/<int:id>',AddCollaboratorForNotes .as_view(), name='Addcollaborator'),
     path('notes/', CreateNotes.as_view(), name='notecreation'),
     path('notesdisplay/', DisplayNotes.as_view(), name='notedisplay'),
     path('SEARCHNOTES/', Notesearch.as_view(), name='notesearchby(title)'),
