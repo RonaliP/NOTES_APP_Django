@@ -36,7 +36,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_swagger',
     'drf_yasg',
-
+    'django_filters',
+    'django_celery_results',
+    'django_celery_beat',
     'authentication.apps.AuthenticationConfig',
     'Notes',
 
@@ -75,6 +77,33 @@ WSGI_APPLICATION = 'TODO_LIST.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+#CELERY_BROKER_URL = 'amqp://localhost'
+# CELERY STUFF
+"""
+BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'India'
+"""
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+
+CACHE_TTL=60 * 1440
+
+CACHES={
+
+    "default":{
+        "BACKEND":"django_redis.cache.RedisCache",
+        "LOCATION":"REDIS://127.0.0.1:6379/1",
+        "OPTIONS":{
+            "CLIENT_CLASS":"django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX":"RONALI"
+    }
+}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -87,7 +116,9 @@ DATABASES = {
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated',]
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated',],
+
+    #'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 
 }
 SWAGGER_SETTINGS = {
@@ -150,3 +181,32 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'ronalipanigrahy88@gmail.com'
 EMAIL_HOST_PASSWORD = '123@we$*'
+
+
+LOGGING = {
+    'version': 1,
+    # Version of logging
+    'disable_existing_loggers': False,
+    #disable logging
+    # Handlers #############################################################
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'notes-debug.log',
+        },
+########################################################################
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    # Loggers ####################################################################
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG')
+        },
+    },
+}
