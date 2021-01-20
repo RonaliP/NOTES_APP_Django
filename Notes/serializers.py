@@ -2,6 +2,9 @@ from rest_framework import serializers
 from Notes.models import Notes, Labels
 from authentication.models import User
 from rest_framework.renderers import JSONRenderer
+from datetime import datetime, timedelta
+from django_celery_results.models import TaskResult
+import time
 
 
 class NotesSerializer(serializers.ModelSerializer):
@@ -75,3 +78,15 @@ class AddLabelsToNoteSerializer(serializers.ModelSerializer):
             title = attrs.get('title', '')
             content = attrs.get('content', '')
             return attrs
+
+
+class ReminderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Notes
+        fields=['reminder']
+
+        def validate(self,time):
+            if time.replace(tzinfo=None)-datetime.now()<timedelta(seconds=10):
+                raise serializers.ValidationError('SET THE REMINDER FOR VALID TIME')
+            return time
+
