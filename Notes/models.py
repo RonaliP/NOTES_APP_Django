@@ -19,3 +19,4 @@ class Notes(models.Model):
     isDelete = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True, null=False, blank=False)
     collaborator = models.ForeignKey(to=User, related_name='user', on_delete=models.CASCADE, blank=True, null=True)
+    reminder = models.DateTimeField(default=None, blank=True, null=True)
