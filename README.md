@@ -29,7 +29,7 @@
 
 -Notes app provides APIs for following features :
    
-   -Create and list notes
+      -Create and list notes
    
    -Create and list labels
    
