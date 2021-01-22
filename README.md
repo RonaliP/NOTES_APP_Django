@@ -57,12 +57,13 @@
       -pip install pyshortners
       -pip install django-redis
       -pip install celery
-   
-   -pip install django-celery-results
-   
-   -pip install django-celery-beat
-   
-   -pip install psycopg2
+      -pip install django-celery-results
+      -pip install django-celery-beat
+      -pip install psycopg2
 
+-Start the project now:
+   -create our project using a command-line utility provided by django.
+
+   -django-admin startproject TODO_LIST
 
 
