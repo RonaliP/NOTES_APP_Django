@@ -87,7 +87,45 @@
 
 -Same steps will be repeated for Notes app.
 
-#Create Models For Apps now:
+# Register apps inside project's app which is TODO_LIST:
+   - inside settings.py
+   
+       INSTALLED_APPS = [
+      'django.contrib.admin',
+      'django.contrib.auth',
+      'django.contrib.contenttypes',
+      'django.contrib.sessions',
+      'django.contrib.messages',
+      'django.contrib.staticfiles',
+      'rest_framework',
+      'authentication.apps.AuthenticationConfig',
+      'notes',
+  ]
+
+# Register models in admins.py of authentication app:
+   
+  from django.contrib import admin
+  from authentication.models import User, UserProfile
+  admin.site.register(User)
+  admin.site.register(UserProfile)
+ _same for Notes app_
+ 
+# Database connection with project:
+
+   - settings.py file:
+   
+   _i used postgres_
+   
+       DATABASES = {
+     'default': {
+         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+         'NAME': 'database name',
+         'USER': 'postgres',
+         'PASSWORD': 'password',
+         'PORT': '5432',
+     }
+ }
+   
 
 
  
