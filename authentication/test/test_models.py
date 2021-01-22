@@ -2,21 +2,17 @@ from django.test import TestCase
 from ..models import User, Profile
 
 
-class TestForUser(TestCase):
+class UserTest(TestCase):
+    """ Test module for User and UserProfile models """
+
     def setUp(self):
-        self.user=User.objects.create(firstname='Sonam',
-                                      lastname='Mehta',
-                                      email='ronalipanigrahy88@gmail.com',
-                                      username='Ronali',
+        self.user=User.objects.create(email='abhi08as.as@gmail.com',username='RonaliP',
                                       password='heyron')
 
-    def test_createuser(self):
-        user = User.objects.get(username='Ronali')
-        self.assertEqual(user.get_email(), "ronalipanigrahy88@gmail.com")
+    def test_create_user(self):
+        user = User.objects.get(username='RonaliP')
+        self.assertEqual(user.get_email(), "abhi08as.as@gmail.com")
 
-
-    def test_profile(self):
-        profile = Profile.objects.get(user=self.user)
-        self.assertEqual(profile.get_DOB(), "")
-
-
+    def test_create_user_profile(self):
+        user_profile = Profile.objects.get(user=self.user)
+        self.assertEqual(user_profile.get_image(), "default.jpg")
