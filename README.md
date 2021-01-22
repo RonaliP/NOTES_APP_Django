@@ -30,51 +30,33 @@
 -Notes app provides APIs for following features :
    
       -Create and list notes
-   
-   -Create and list labels
-   
-   -Archive note
-   
-   -Trash note
-   
-   -Update note
-   
-   -Update label
-   
-   -Delete note
-   
-   -Delete label
-   
-   -Retrieve Note
-   
-   -Retrieve label
-   
-   -List all archived notes
-   
-   -List all trashed notes
-   
-   -Add labels to a note
+      -Create and list labels
+      -Archive note
+      -Trash note
+      -Update note
+      -Update label
+      -Delete note
+      -Delete label
+      -Retrieve Note
+      -Retrieve label
+      -List all archived notes
+      -List all trashed notes
+      -Add labels to a note
    
  #1. (FIRST_STEP)Creation of Django-Project :
     - Create a virtual environment first inside which we will install all the requirements
     
-    _For windows : python -m venv enviromentname_
+    _ For windows : python -m venv enviromentname _
 
    -Activate the virtual environment :enviromentname/Script/activate
    
-   -Install Requirements of this project:
-   
-   -pip install django
-   
-   -pip install djangorestframework
-   
-   -pip install django-rest-framework jwt
-   
-   -pip install pyshortners
-   
-   -pip install django-redis
-   
-   -pip install celery
+      -Install Requirements of this project:
+      -pip install django
+      -pip install djangorestframework
+      -pip install django-rest-framework jwt
+      -pip install pyshortners
+      -pip install django-redis
+      -pip install celery
    
    -pip install django-celery-results
    
