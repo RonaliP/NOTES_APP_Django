@@ -39,7 +39,9 @@ class ArchiveNotesSerializer(serializers.ModelSerializer):
     class Meta:
         model= Notes
         fields=['owner_id','title','content','isArchive','label','collaborator']
-        extra_kwargs = {'title': {'read_only': True},'content': {'read_only': True},'owner_id': {'read_only': True}}
+        extra_kwargs = {'title': {'read_only': True},
+                        'content': {'read_only': True},
+                        'owner_id': {'read_only': True}}
 
 
 class TrashSerializer(serializers.ModelSerializer):
@@ -48,7 +50,10 @@ class TrashSerializer(serializers.ModelSerializer):
     class Meta:
         model= Notes
         fields=['owner_id','title','content','isDelete','isArchive','label','collaborator']
-        extra_kwargs = {'title': {'read_only': True},'content': {'read_only': True},'isArchive':{'read_only':True}, 'owner_id': {'read_only': True}}
+        extra_kwargs = {'title': {'read_only': True},
+                        'content': {'read_only': True},
+                        'isArchive':{'read_only':True},
+                        'owner_id': {'read_only': True}}
 
 
 class AddLabelsToNoteSerializer(serializers.ModelSerializer):

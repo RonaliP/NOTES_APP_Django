@@ -46,9 +46,13 @@ class User(AbstractBaseUser,PermissionsMixin):
     REQUIRED_FIELDS=['username']
 
     objects=UserManager()
+    def get_email(self):
+        return self.email
+
 
     def __str__(self):
         return self.email
+
 
 class Profile(models.Model):
 
@@ -57,6 +61,12 @@ class Profile(models.Model):
     BIO=models.CharField(max_length=200,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(default='default.jpg', upload_to='profile_pic')
+
+    def get_image(self):
+        return self.image
+
+    def __str__(self):
+        return str(self.user)
 
 
 

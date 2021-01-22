@@ -20,8 +20,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('username must only contain alphanumeric')
         return attrs
 
-    def create(self ,validated_data):
-        return User.objects.create_user(**validated_data)
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
+
 
 
 
@@ -34,7 +36,7 @@ class EmailVerificationSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.ModelSerializer):
     email =serializers.EmailField()
-    password =serializers.CharField(max_length=68, min_length=3)
+    password =serializers.CharField(min_length=3)
 
 
     class Meta:
@@ -107,10 +109,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ['DOB', 'image', 'user_id']
 
-    def validate(self, attrs):
-        DOB = attrs.get('DOB', '')
-        image = attrs.get('image', '')
-        return attrs
 
 
 
