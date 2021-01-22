@@ -61,9 +61,35 @@
       -pip install django-celery-beat
       -pip install psycopg2
 
--Start the project now:
+# Start the project now:
    -create our project using a command-line utility provided by django.
 
-   -django-admin startproject TODO_LIST
+      -django-admin startproject TODO_LIST
+      
+ _Now to check whether all the installments are done properly and to check if the server is running properly_
+ 
+    -Try this command to start server :python manage.py runserver
+      
+ - Hit http://127.0.0.1:8000/ 
+ 
+ #Start with creating apps:
+ 
+    -python manage.py startapp app name(in my case its authentication)
+    
+ - Configure the app
+
+   - Create file in urls.py inside app.
+
+   - Inside project root directory add the path of this created urls.py in app :
+
+     - path('authentication/',include('authentication.urls'))
+   - Inside app in the urls.py file add route for view created in app.
+
+-Same steps will be repeated for Notes app.
+
+#Create Models For Apps now:
+
+
+ 
 
 
