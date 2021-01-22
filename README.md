@@ -1,7 +1,8 @@
 # NOTES_APP_Django
 ### Description :
 
-This is django Project in which rest APIs are created for authentication and notes creation.
+	This Project is a clones the behaviour of Google's Keep Notes app.
+	in which rest APIs are created for authentication and notes creation.
 
 There are two apps in this project :
 
