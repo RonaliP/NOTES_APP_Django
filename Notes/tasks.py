@@ -7,10 +7,11 @@ import time
 
 @shared_task()
 def set_reminder():
-    notes = Notes.objects.filter(is_trash=False).exclude(reminder=None)
+    notes = Notes.objects.filter(isDelete=False).exclude(reminder=None)
     for note in notes:
-        reminder_timedelta=note.reminder.replace(tzinfo=None)-datetime.now()
-        if reminder_timedelta <= timedelta(minutes=1):
-            note.reminder=None
+        if note.reminder.replace(tzinfo=None) - datetime.now() <= timedelta(seconds=1):
+            note.reminder = None
             note.save()
-            return f'{note}reminder'
+            return note
+
+
