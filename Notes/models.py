@@ -10,6 +10,9 @@ class Labels(models.Model):
     owner=models.ForeignKey(to=User, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True, null=False, blank=False)
 
+    def get_name(self):
+        return self.name
+
 class Notes(models.Model):
     owner = models.ForeignKey(to=User, on_delete=models.CASCADE)
     title=models.TextField()
@@ -18,5 +21,14 @@ class Notes(models.Model):
     isArchive = models.BooleanField(default=False)
     isDelete = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True, null=False, blank=False)
-    collaborator = models.ForeignKey(to=User, related_name='user', on_delete=models.CASCADE, blank=True, null=True)
+    collaborator = models.ManyToManyField(to=User, related_name='collaborator')
     reminder = models.DateTimeField(default=None, blank=True, null=True)
+    trashedAt = models.DateTimeField(default=None, null=True, blank=True)
+
+
+    def get_content(self):
+        return self.content
+
+    def get_owner(self):
+        return self.owner
+
