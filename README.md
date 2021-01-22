@@ -4,7 +4,8 @@
 	This is Notes app which is bhilt using Django which tries to clone the behaviour of Google's Keep Notes app.
 	in which rest APIs are created for authentication of users and all Notes operations.
 
-**There are two apps in this project :**
+_Lets start with the project i created first_
+**I created TODO_LIST project first by command(django-admin startproject TODO_LIST)**
 
 authentication
 notes
