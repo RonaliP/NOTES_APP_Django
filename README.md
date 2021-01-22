@@ -10,6 +10,9 @@
 
 (You can follow django official documentation for all the steps)
 
+-THERE  ARE TWO DJANGO APPS I CREATED INSIDE TODO_LIST
+ -authentication
+ -Notes
 authentication
 notes
 authentication app provides APIs for following features:
