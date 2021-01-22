@@ -1,7 +1,7 @@
 # NOTES_APP_Django
 ### Description :
 
-	This is Notes app which is bhilt using Django which tries to clone the behaviour of Google's Keep Notes app.
+	This is Notes app which is built using Django which tries to clone the behaviour of Google's Keep Notes app.
 	in which rest APIs are created for authentication of users and all Notes operations.
 
 >_Lets start with the project i created first_
@@ -11,10 +11,11 @@
 (You can follow django official documentation for all the steps)
 
 - I created two django apps inside TODO_LIST:
+
  -authentication
  -Notes
-authentication
-notes
+ 
+
 authentication app provides APIs for following features:
 
 Registration using email verification.
