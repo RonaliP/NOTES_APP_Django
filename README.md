@@ -12,17 +12,17 @@
 
 - I created two django apps inside TODO_LIST:
 
- - authentication
- - Notes
+   - authentication
+   - Notes
  
 
 - authentication app provides APIs for following features:
 
- - Registration
- - email verification by sending token to user's email.
- - Login and logout
- - Reset password
- - UserProfile
+   - Registration
+   - email verification by sending token to user's email.
+   - Login and logout
+   - Reset password
+   - UserProfile
 For authentication JWT token is used.
 
 For user profile creation signal is used.
