@@ -5,7 +5,9 @@
 	in which rest APIs are created for authentication of users and all Notes operations.
 
 _Lets start with the project i created first_
+
 **I created TODO_LIST project first by command(django-admin startproject TODO_LIST)**
+(You can follow django official documentation for all the steps)
 
 authentication
 notes
