@@ -125,9 +125,120 @@
          'PORT': '5432',
      }
  }
-   
-
-
  
+ ##Create Models:
+ 
+   -There are two models in authentication app:
+      -User
+      -Profile
+   -There are two models in Notes app:
+      -Notes
+      -Labels
+##Migration:
+_In Terminal_
+-migrate : python manage.py makemigrations
 
+-makemigrations : python manage.py migrate
+   
+#SERIALIZERS
 
+-Create serializers.py file inside the authentication app and create following serializer for every view in the views.py:
+
+   -RegisterSerializer
+   -EmailVerificationSerializer
+   -LoginSerilaizer
+   -ResetPasswordSerializer
+   -NewPasswordSerializer
+   -UserProfilrSerializer
+
+-Create following serializer for notes app:
+
+   -NotesSerializer
+   -LabelsSerializer
+   -ArchiveNotesSerializer
+   -TrashSerializer
+   -AddNotesInLabelsSerializer
+   -AddLabelsToNoteSerializer
+
+ -Create views for authentication:
+ 
+ 1.Registerview:
+    -Create a view by extending CreateAPIView. The serializer_class tells which serializer to use and the permission_classes handles who can access the API.
+
+   -Allow any user (authenticated or not) to hit this endpoint.
+
+   -serializer = self.serializer_class(data=request.data) restore those native datatypes into a dictionary of validated data.
+
+   -serializer.is_valid(raise_exception=True) checks if the data is as per serializer fields otherwise throws an exception.
+
+   -serializer.save() to return an object instance, based on the validated data.
+
+   -Generate jwt token using user details :
+
+    payload = jwt_payload_handler(user)
+    token = jwt.encode(payload,settings.SECRET_KEY)   
+   -Create email verification link :
+
+     absurl = 'http://'+current_site+relativeLink+'?token='+str(token)
+   -Short this link by using pyshortners.
+
+   -Send token on given email id:
+
+   -Create a file in app named as Utils.py :
+
+     from django.core.mail import EmailMessage
+   -Using EmailMessage() we can send this verification link on email.
+
+   -Other variables need to be set to send email: In settings.py:
+
+     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+     EMAIL_USE_TLS = True
+     EMAIL_HOST = 'smtp.gmail.com'
+     EMAIL_PORT = 587
+     EMAIL_HOST_USER = 'abc@gmail.com'
+     EMAIL_HOST_PASSWORD = '***'
+     
+2. VerifyEmail view:
+
+   -Get token from url and decode it to fetch user details.
+
+   -Check token validations.If not then raise jwt errors.
+
+   -Set the is_active and is_verified field as true :
+
+       payload = jwt.decode(token,settings.SECRET_KEY)
+       user = User.objects.get(id=payload['user_id'])
+       if not user.is_verified:
+         user.is_verified=True
+         user.is_active=True
+         user.save()
+	 
+3. LoginView:
+   -Create a post method.
+
+   -Set serializer class and pass request data to it for validations.
+
+   -Check if user exists or not, if not then raise error.
+   ```python
+    def validate(self, attrs):
+      email= attrs.get('email','')
+      password = attrs.get('password','')
+      try:
+          user = User.objects.get(email =email, password=password)
+          if not user:
+              raise AuthenticationFailed("Invalid credentials given!!!")
+          if not user.is_active:
+              raise AuthenticationFailed("Account is deactivated!!!")
+          if not user.is_verified:
+              raise AuthenticationFailed("Email is not verified!!!")
+      except serializers.ValidationError as identifier:
+          return {'error':"Please provide email and password"}
+      return {
+          'email':user.email,
+          'username':user.username,
+          'password':user.password,
+      }
+    ```
+    
+    
+      
