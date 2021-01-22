@@ -90,6 +90,7 @@ CELERY_TIMEZONE = 'India'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 
+
 CACHE_TTL=60 * 1440
 
 CACHES={
@@ -162,7 +163,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'ASIA/KOLKATA'
 
 USE_I18N = True
 
@@ -182,7 +183,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'ronalipanigrahy88@gmail.com'
 EMAIL_HOST_PASSWORD = '123@we$*'
 
-
+"""
 LOGGING = {
     'version': 1,
     # Version of logging
@@ -207,6 +208,26 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
             'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG')
+        },
+    },
+}
+"""
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'notes-debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     },
 }
