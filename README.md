@@ -239,6 +239,46 @@ _In Terminal_
           'password':user.password,
       }
     ```
+4. ResetPassword View:
+   -Take email from user validates it to generate jwt token.
+   
+   -Create link using token and send it to user email.
+   
+   -If email does not exist then raise validation error.
+   
+   -Use pyshortners to short this verification link.
+
+5. NewPassword View:
+   -Get token from url and decode it using jwt.decode().
+
+   -fetch user details from it.
+
+   -check if token is valid or not, if it is then set new validated password for user.
+
+   -Otherwise raise jwt exceptions.
     
-    
+    ```python
+     try:
+      payload = jwt.decode(token,settings.SECRET_KEY)
+      user = User.objects.get(id=payload['user_id'])
+      user.password = user_data['password']
+      user.save()    
+      return Response({'email':'New password is created'},status=status.HTTP_200_OK)
+  except jwt.ExpiredSignatureError as identifier:
+      return Response({'error':'Link is Expired'}, status=status.HTTP_400_BAD_REQUEST)
+  except jwt.exceptions.DecodeError as identifier:
+      return Response({'error':'Invalid Token'}, status=status.HTTP_400_BAD_REQUEST)```
+  
+  
+5. Logout View:
+   -Set permsission as IsAuthenticated. So only authenticated and logged in user will be able to access it.
+  
+  -Call logout()
+6. UserProfile view:
+   -Use RetreiveUpdate from generics that will provide views to update user profile.
+
+   -to get current user profiel rewrite the get_object method :
+
+       def get_object(self):
+         return self.request.user.profile
       
