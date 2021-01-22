@@ -10,7 +10,7 @@
 
 (You can follow django official documentation for all the steps)
 
--THERE  ARE TWO DJANGO APPS I CREATED INSIDE TODO_LIST
+- I created two django apps inside TODO_LIST:
  -authentication
  -Notes
 authentication
