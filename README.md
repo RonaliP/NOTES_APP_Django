@@ -274,7 +274,7 @@ _In Terminal_
    -Set permsission as IsAuthenticated. So only authenticated and logged in user will be able to access it.
   
   -Call logout()
-6. UserProfile view:
+6. Profile view:
    -Use RetreiveUpdate from generics that will provide views to update user profile.
 
    -to get current user profiel rewrite the get_object method :
@@ -282,3 +282,169 @@ _In Terminal_
        def get_object(self):
          return self.request.user.profile
       
+##View for notes app:
+
+-Every view is a calss based and following attribues need to be set for each:
+
+   -serializer_class : serilaizer class
+   -queryset : Model object
+   -permission_classes = (permissions.IsAuthenticated, IsOwner)
+1. CraeteAndListNotes :
+   -It will extend CreateAndListView from generics of rest frame work.
+   -It provides following views :
+      -Post : To create a new note.
+      -Get : To list all created notes for a user.
+   -1Pass request data to NotesSerializer for validation and serialized data with current user id.
+   -Re write perform_create method to save data and get_queryset() to get records from database.
+2. NoteDetails view:
+   -It extends RetrieveUpdateDestroyView from generics.
+   -It provides look-up field to get note by its id.
+   -It provides views :
+      -get : To retrieve note .
+      -(put, patch) : To update note .
+      -delete : To delete note.
+3. CreateAndListLabels view :
+   -It will extend CreateAndListView from generics of rest frame work.
+   -It provides following views :
+      -Post : To create a new label.
+      -Get : To list all created labels for a user.
+4. LabelDetails view:
+   -It extends RetrieveUpdateDestroyView from generics.
+   -It provides look-up field to get note by its id.
+   -It provides views :
+      -get : To retrieve label.
+     -(put, patch) : To update label.
+      -delete : To delete label.
+5. ArchiveNote view:
+   -It extends RetrieveUpdateDestroyView from generics.
+   -It provides look-up field to get note by its id.
+   -It provides views :
+      -(put, patch) : To update archive field's value of note.
+6. NoteToTrash view :
+   -It extends RetrieveUpdateDestroyView from generics.
+   -It provides look-up field to get note by its id.
+   -It provides views :
+      -(put, patch) : To update isDelete field's value of note.
+7. ArchiveNotesList view :
+   -It extends ListAPIView from generics.
+   -It provides views :
+      -get : To get all notes with archive field's value as true.
+8. TrashList view :
+   -It extends ListAPIView from generics.
+   -It provides views :
+      -get : To get all notes with isDelete field's value as true.
+9. AddLabelsToNote view :
+   -It extends RetrieveUpdateDestroyView from generics.
+
+   -It provides look-up field to get note by its id.
+
+   -It provides views :
+
+      -(put, patch) : To update add label list to note.
+10. ListNotesInLabel view :
+   -Use same serializer class as AddLabelsToNote view.
+
+   -Rewite the get_queryset() to filter queryset according to label id given in lookup field:
+   -It provides views :
+
+      -get : To get all notes list with smae label.
+11. SearchNote view :
+   -Get the search parameter and pass it to the get_queryset() :
+
+      Request.GET.get('search')
+   -Override the get_queryset() to match the search parameter with records data.
+
+   -To match the search query parameter with model field data, use icontains lookup. It matches the data case insensetive :
+
+      fieldname__icontains
+12. AddCollaborator view :
+   -Create a field in notes model to add collaborator.
+   -Give pemission to added user in colloborator field to access note .
+   -To give permissions overrid the permission methods.
+ 
+##Create route
+
+-For every view we have to create route in urls.py in its correspnding app.
+
+-To access these APIs the corrosponding path has to be provided on localhost.
+
+     urlpatterns = [
+      path('register/',RegisterView.as_view() , name='register'),
+      path('login/',LoginAPIView.as_view() , name='login'),
+      path('logout/', LogoutView.as_view(), name='logout'),
+      path('verify-email/',VerifyEmail.as_view() , name='verify-email'),
+      path('reset-password/',ResetPassword.as_view() , name='reset-password'),
+      path('new-pass/', NewPassword.as_view(), name='new-pass'),
+      path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    ]
+    
+    
+##Redis Installation :
+About redis : Redis is an in-memory data structure store that can be used as a caching engine. Since it keeps data in RAM, Redis can deliver it very quickly. Redis is not the only product that we can use for caching.
+Use this link to download redis for windows: https://github.com/MicrosoftArchive/redis/releases
+Download and run .msi file for installation.
+
+Redis cache implementation :
+Set custom cache backend in settings :
+
+  CACHES = {
+      "default": {
+          "BACKEND": "django_redis.cache.RedisCache", 
+          "LOCATION": "redis://127.0.0.1:6379/1",
+          "OPTIONS": {
+              "CLIENT_CLASS": "django_redis.client.DefaultClient",
+              "TIMEOUT": 3600
+          },
+          "KEY_PREFIX": "keep"
+      }
+  }
+##Accessing the cache:
+
+         import : from django.core.cache import cache
+         cache.set(key, value, timeout=DEFAULT_TIMEOUT, version=None)
+         cache.get(key, default=None, version=None)
+-For each API call check if data is present in cache or not by using cache.get(key).
+
+-If it is there then retrieve data from to cache only otherwise perform query on database and set that data to cache by using cache.set(key, data). So that next time that data can be retrieved from cache.
+
+##RabbitMQ Installation:
+   -First we need to download and install erlang from the given link for windows: https://erlang.org/download/otp_versions_tree.html
+   -Then we need to download and install rabbitMQ server for windows : https://www.rabbitmq.com/install-windows.html
+
+   -then go to start menu and search for rabbitmq command prompt
+
+   -type command "rabbitmq-plugins enable rabbitmq_management"
+
+   -All set to go now go to http://localhost:15672
+
+   -Use following credentials for authentication:
+
+     username: guest
+     passowrd: guest
+     
+##Celery:
+-Add the CELERY_BROKER_URL configuration to the settings.py file :
+
+      CELERY_BROKER_URL = 'amqp://localhost'
+-In project root folder create a new file named celery.py and add the following code in that :
+
+      import os
+      from celery import Celery
+      os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project_name.settings')
+      app = Celery('project_name')
+      app.config_from_object('django.conf:settings', namespace='CELERY')
+      app.autodiscover_tasks()
+-Now edit the init.py file in the project root:
+
+      from .celery import app as celery_app
+      __all__ = ['celery_app']
+-Create a file named tasks.py inside a Django app and put all our Celery tasks into this file. Basic structure is here :
+
+      from celery import shared_task
+
+      @shared_task
+      def name_of_your_function(optional_param):
+          pass  # do something heavy
+-Starting The Worker Process : Open a new terminal tab, and run the following command:
+
+      celery -A mysite worker -l info
